@@ -1,0 +1,37 @@
+
+
+Command:
+
+	docker run --rm -it -v ~/.msf4:/root/.msf4 -v /tmp/msf:/tmp/data metasploit
+
+msfconsole(){
+
+    # --help for this in the event I forget I'm using a docker for this
+    echo "Working directory is in /tmp/msf"
+    echo "Default open ports in use are (for both TCP/UDP):"
+    echo "80, 443, 445, 4444, 8080 and 8081"
+    echo "\n"
+    echo "Press enter to continue"
+    docker run --rm -it -v ~/.msf4:/root/.msf4 -v /tmp/msf:/tmp/data metasploit
+}
+
+
+    for arg in "$@"
+    do
+        if [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]] #in zsh you need double square brackets for string comparasion so best to use it all the time (bash works with single or double)
+        then
+            echo "command usage: eyewitness [path_to_folder] [EyeWitness_flags_and_input]"
+            echo "for eyewitness --help, use --extendedhelp"
+            return
+        
+        elif [[ "$arg" == "--extendedhelp" ]]
+        then
+            docker run --rm -it web/eyewitness --help
+		return
+        else
+		docker run --rm -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $1:/tmp/EyeWitness web/eyewitness ${@:2} # pass all arguments starting at 2nd argument
+		return
+        fi
+    done
+    
+}
