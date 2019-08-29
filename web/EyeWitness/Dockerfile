@@ -1,5 +1,4 @@
-FROM phusion/baseimage
-LABEL maintainer Netanel Ravid
+FROM ubuntu
 
 ARG user=eyewitness
 
