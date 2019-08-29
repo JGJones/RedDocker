@@ -1,1 +1,0 @@
-docker run --rm -it -v ~/.msf4:/root/.msf4 -v /tmp/msf:/tmp/data metasploit
