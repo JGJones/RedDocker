@@ -19,6 +19,7 @@ RUN apt-get update && \
 #
 	git clone https://github.com/m8r0wn/nullinux.git && \
 	cd nullinux && \
+	rm -rf .git && \
 	bash setup.sh && \
 #
 # Cleanup

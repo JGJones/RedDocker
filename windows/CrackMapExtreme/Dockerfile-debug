@@ -1,0 +1,52 @@
+FROM ubuntu
+LABEL maintainer="JGJones"
+
+# Reference:
+# https://github.com/byt3bl33d3r/CrackMapExec/wiki/Installation
+
+USER root
+WORKDIR /opt
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+	apt-get install -y \
+	#--no-install-recommends \
+	libssl-dev \
+	libffi-dev \
+	python3-dev \
+	python3-pkg-resources \
+	python3-cryptography \
+	tmux \
+	python3 \
+# packages to be removed in clean-up below:
+	python3-pip \
+	python3-setuptools \
+	build-essential \
+	ca-certificates \
+	git
+#
+# CrackMapExtreme
+#
+RUN	git clone --recursive https://github.com/awsmhacks/CrackMapExtreme.git && \
+	rm -rf CrackMapExtreme/.git && \
+	cd CrackMapExtreme && \
+	pip3 install -r requirements.txt && \
+	python3 setup.py install && \
+	cmx -h && \
+#
+# Clean up
+#
+#	apt-get --purge remove ca-certificates build-essential python-setuptools python-pip git -y && \
+#	apt-get --purge autoremove -y && \
+#	apt-get clean && \
+#	rm -rf /var/lib/apt/lists/*
+
+# Copy tmux.conf
+COPY tmux.conf /root/.tmux.conf
+
+VOLUME /tmp/data
+
+WORKDIR /tmp/data
+
+ENTRYPOINT ["tmux"]

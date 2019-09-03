@@ -14,6 +14,7 @@ RUN apt-get update && \
 #
     git clone https://github.com/hatlord/snmpwn && \
     cd snmpwn && \
+    rm -rf .git && \
     gem install bundler && \
     bundle install && \
 #
