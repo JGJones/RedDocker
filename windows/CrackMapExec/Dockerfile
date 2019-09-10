@@ -39,7 +39,7 @@ RUN apt-get update && \
 	apt-get --purge remove ca-certificates build-essential python-setuptools python-pip git -y && \
 	apt-get --purge autoremove -y && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/{apt,dpkg,cache,log,lists}
 
 # Copy tmux.conf
 COPY tmux.conf /root/.tmux.conf

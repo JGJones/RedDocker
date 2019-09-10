@@ -22,7 +22,7 @@ RUN apt-get update && \
 #
     apt-get --purge remove git -y && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/{apt,dpkg,cache,log,lists}
 
 ENV PATH="/home/snmpwn/snmpwn/:${PATH}"
 USER snmpwn

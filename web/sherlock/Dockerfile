@@ -81,7 +81,7 @@ RUN DEBIAN_FRONTEND=noninteractive && \
 	curl \
 	python3-pip \
 	python3-setuptools && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/{apt,dpkg,cache,log,lists}
 
 USER root
 ENTRYPOINT [ "ruby", "/home/sherlock/sherlock/sherlock.rb" ]

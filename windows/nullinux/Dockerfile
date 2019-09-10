@@ -31,7 +31,8 @@ RUN apt-get update && \
 	python3-pip && \
 	apt --purge autoremove -y && \
 	apt clean && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/{apt,dpkg,cache,log,lists}
 
+USER nullinux
 ENTRYPOINT [ "nullinux" ]
 CMD [ "-h" ]

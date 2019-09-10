@@ -40,3 +40,19 @@ Function to put into your .zshrc or .bashrc file:
 	}
 
 
+Improved function - must be run within folder containing nessus file
+
+	eyewitness() {
+	     i=0
+	     args=''
+	     # add docker path prefix to -x and -f
+	     for arg in "$@"; do
+	           ((i++))
+	           if [[ ${@[$((${i}-1))]} == "-x" || ${@[$((${i}-1))]} == "-f" ]]; then
+	                arg="/tmp/EyeWitness/${arg}"
+	           fi
+	           args="${args} ${arg}"
+	     done
+	     # run docker command
+	     eval "docker run --rm -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v `pwd`:/tmp/EyeWitness eyewitness ${args}"
+	};

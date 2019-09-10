@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 LABEL maintainer - JGJ
 
-# TODO? RUN useradd -c 'enum4linux' -m -s /sbin/nologin enum4linux
+RUN useradd -c 'enum4linux' -m -s /sbin/nologin enum4linux
 
 WORKDIR /tmp
 
@@ -41,8 +41,8 @@ RUN apt-get update && \
 	apt-get --purge remove ca-certificates wget git python-setuptools -y && \
 	apt-get --purge autoremove -y && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/{apt,dpkg,cache,log,lists}
 
-#USER enum4linux
+USER enum4linux
 ENTRYPOINT [ "enum4linux" ]
 CMD [ "-h" ]
