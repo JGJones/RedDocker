@@ -1,14 +1,13 @@
-FROM ubuntu
+FROM alpine:latest
 
-RUN useradd -c 'snmpwn' -m -s /sbin/nologin snmpwn
+#RUN useradd -c 'snmpwn' -m -s /sbin/nologin snmpwn
+WORKDIR /opt
 
-WORKDIR /home/snmpwn
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apk update && apk upgrade &&\
+    apk --no-cache add \
     git \
-    ca-certificates \
-    ruby && \
+    ruby \
+    ruby-rdoc && \
 #
 #   Fetch snmpwn and set up
 #
@@ -20,12 +19,11 @@ RUN apt-get update && \
 #
 #   Clean up
 #
-    apt-get --purge remove git -y && \
-    apt-get clean && \
-    rm -rf /var/lib/{apt,dpkg,cache,log,lists}
+    apk --purge del git && \
+    rm -rf /var/cache/apk/*
 
-ENV PATH="/home/snmpwn/snmpwn/:${PATH}"
-USER snmpwn
+ENV PATH="/opt/snmpwn/:${PATH}"
+USER nobody
 
 ENTRYPOINT [ "snmpwn.rb" ]
 CMD [ "--help" ]

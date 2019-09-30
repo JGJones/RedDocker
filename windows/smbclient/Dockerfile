@@ -1,12 +1,11 @@
-FROM ubuntu:latest
+FROM alpine:latest
 
-RUN useradd -c 'smbclient' -m -s /sbin/nologin smbclient
-RUN apt-get update && \
-	apt-get install -y --no-install-recommends \
-	smbclient \
-	samba-common-bin && \
-	apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#RUN adduser -D -s /sbin/nologin smbclient
+RUN	apk update && \
+	apk upgrade && \
+	apk add samba-client && \
+	rm -rf /var/cache/apk/*
 
-USER smbclient
+#USER smbclient
 ENTRYPOINT [ "smbclient" ]
 CMD [ "-h" ]

@@ -1,38 +1,28 @@
-FROM ubuntu
+FROM alpine:latest
 LABEL maintainer - JGJ
 
-ARG DEBIAN_FRONTEND=noninteractive
+#RUN useradd -c 'nullinux' -m -s /sbin/nologin nullinux
+WORKDIR /opt
 
-RUN useradd -c 'nullinux' -m -s /sbin/nologin nullinux
-WORKDIR /home/nullinux
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apk update && \
+	apk upgrade && \
+    apk add \
     python3 \
-    python3-pip \
-    python3-setuptools \
+    py3-setuptools \
     git \
-    smbclient \
-    ca-certificates && \
+    samba-client && \
 #
 # Get nullinux
 #
 	git clone https://github.com/m8r0wn/nullinux.git && \
 	cd nullinux && \
 	rm -rf .git && \
-	bash setup.sh && \
+	pip3 install -r requirements.txt && \
 #
 # Cleanup
 #
-	apt --purge -y remove \
-	ca-certificates \
-	git \
-	python3-setuptools \
-	python3-pip && \
-	apt --purge autoremove -y && \
-	apt clean && \
-	rm -rf /var/lib/{apt,dpkg,cache,log,lists}
+	apk del py3-setuptools ca-certificates libcurl git && \
+	rm -rf /var/cache/apk/*
 
-USER nullinux
-ENTRYPOINT [ "nullinux" ]
+ENTRYPOINT [ "/opt/nullinux/nullinux.py" ]
 CMD [ "-h" ]
