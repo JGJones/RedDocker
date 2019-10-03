@@ -1,3 +1,12 @@
 [submodule "infrastructure/sherlock/sherlock"]
 	path = infrastructure/sherlock/sherlock
 	url = https://github.com/hatlord/sherlock.git
+[submodule "windows/RedSnarf/redsnarf"]
+	path = windows/RedSnarf/redsnarf
+	url = https://github.com/rmdavy/redtest.git
+[submodule "windows/RedSnarf/pth-toolkit"]
+	path = windows/RedSnarf/pth-toolkit
+	url = https://github.com/byt3bl33d3r/pth-toolkit.git
+[submodule "windows/RedSnarf/creddump7"]
+	path = windows/RedSnarf/creddump7
+	url = https://github.com/Neohapsis/creddump7.git

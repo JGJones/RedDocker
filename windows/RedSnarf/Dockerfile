@@ -1,57 +1,95 @@
-FROM ubuntu
+FROM python:2-alpine AS builder
 LABEL maintainer="JGJones"
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && \
-    apt-get install -y git python-setuptools python-pip \
-    python-ipy python2.7-dev libpq-dev python-dev libxml2-dev \
-    libxslt1-dev libldap2-dev libsasl2-dev libffi-dev libssl-dev \
-    build-essential --fix-missing && \
-	rm -rf /var/lib/apt/lists/*
+ENV VIRTUAL_ENV="/opt/venv"
+ENV JOHN="/opt/JohnTheRipper"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-USER root
-COPY tmux.conf /root/.tmux.conf
+RUN apk --no-cache add \
+    git \
+    python2-dev \
+    postgresql-dev \
+    libxml2-dev \
+    libxslt-dev \
+    openldap-dev \
+    cyrus-sasl-dev \
+    libffi-dev \
+    openssl-dev \
+    perl \
+	build-base 
+#	bash 
+
+WORKDIR /opt
+RUN pip install virtualenv && virtualenv $VIRTUAL_ENV
+
 # Impacket 
 
-WORKDIR /tmp
-RUN git clone https://github.com/SecureAuthCorp/impacket.git && \
-	/bin/bash -l -c "cd impacket && python setup.py install" && \
-	rm -rf /tmp/impacket
+RUN git clone https://github.com/SecureAuthCorp/impacket.git &&\
+	cd impacket &&\
+	python setup.py install
 
 # RedSnarf (using rmdavy's forked version as more up to date)
 
-WORKDIR /opt
+RUN pip install ipy \
+	netaddr \
+	requests \
+	pyopenssl \
+	termcolor \
+	python-ldap \
+	pysmb \
+	docopt \
+	pyuserinput \
+	wget \
+	pywinrm \
+	pycrypto
 
-RUN git clone https://github.com/byt3bl33d3r/pth-toolkit.git && \
-	git clone https://github.com/Neohapsis/creddump7 && \
-	git clone https://github.com/savon-noir/python-libnmap.git && \
-	git clone https://github.com/magnumripper/JohnTheRipper.git && \
-	git clone https://github.com/rmdavy/redtest.git redsnarf
 
-RUN /bin/bash -l -c "pip install netaddr" && \
-	/bin/bash -l -c "pip install termcolor" && \
-	/bin/bash -l -c "pip install python-ldap" && \
-	/bin/bash -l -c "pip install pysmb" && \
-	/bin/bash -l -c "pip install docopt" && \
-	/bin/bash -l -c "pip install pyuserinput" && \
-	/bin/bash -l -c "pip install wget" && \
-	/bin/bash -l -c "pip install pywinrm"
+RUN git clone https://github.com/savon-noir/python-libnmap.git &&\
+	git clone https://github.com/magnumripper/JohnTheRipper.git
 
-RUN /bin/bash -l -c "cd python-libnmap && python setup.py install"
 
-RUN /bin/bash -l -c "cd JohnTheRipper/src && ./configure CFLAGS=\"-g -O2 -mno-avx2\" && make clean && make -s"
+	# git clone https://github.com/byt3bl33d3r/pth-toolkit.git && \
+	# git clone https://github.com/Neohapsis/creddump7 && \
 
-RUN chmod +x redsnarf/redsnarf.py && \
-	/bin/bash -l -c "cd redsnarf && ./redsnarf.py --auto_complete install"
+COPY redsnarf /opt/redsnarf
 
-ENV PATH=$PATH:/opt/redsnarf:/opt/pth-toolkit
-VOLUME /tmp/data
-WORKDIR /tmp/data
+RUN cd python-libnmap && python setup.py install
 
-RUN apt-get --purge remove build-essential python-pip && \
-	apt-get --purge autoremove && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+RUN cd $JOHN/src && ./configure CFLAGS="-g -O2 -mno-avx2" && make clean && make -s
+RUN apk add bash
+RUN mkdir /etc/bash_completion.d
+RUN cd redsnarf && python redsnarf.py --auto_complete install
 
-ENTRYPOINT [ "bash" ]
+#ENV PATH=$PATH:/opt/redsnarf
+
+#ENTRYPOINT [ "sh" ]
 #CMD [ "-h" ]
+
+FROM python:2-alpine
+LABEL maintainer="JGJones"
+
+ENV VIRTUAL_ENV="/opt/venv"
+ENV JOHN="/opt/JohnTheRipper"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/redsnarf:$JOHN/run"
+
+COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
+COPY --from=builder $JOHN/run $JOHN/run
+COPY --from=builder /etc/bash_completion.d /etc/bash_completion
+COPY pth-toolkit /opt/pth-toolkit
+COPY creddump7 /opt/creddump7
+COPY redsnarf /opt/redsnarf
+
+RUN chmod +x /opt/redsnarf/redsnarf.py
+
+RUN apk --no-cache add \
+	libldap \
+	libffi \
+	libxslt \
+	libxml2 \
+	libgomp
+
+
+VOLUME /tmp/data
+#WORKDIR /tmp/data
+ENTRYPOINT ["python", "/opt/redsnarf/redsnarf.py"]
+CMD ["--help"]
