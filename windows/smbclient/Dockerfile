@@ -1,11 +1,10 @@
 FROM alpine:latest
 
-#RUN adduser -D -s /sbin/nologin smbclient
-RUN	apk update && \
-	apk upgrade && \
-	apk add samba-client && \
-	rm -rf /var/cache/apk/*
+RUN	apk --no-cache add samba-client 
 
-#USER smbclient
-ENTRYPOINT [ "smbclient" ]
-CMD [ "-h" ]
+CMD [ "smbclient -h" ]
+
+# docker build -t burstears/smbclient .
+# alias smbclient="docker run --rm -it burstears/smbclient smbclient"
+# alias nmblookup="docker run --rm -it burstears/smbclient nmblookup"
+# alias rpcclient="docker run --rm -it burstears/smbclient rpcclient"

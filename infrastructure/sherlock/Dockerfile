@@ -12,8 +12,7 @@ RUN apk --no-cache add \
 	openssl-dev \
 	build-base \
 	autoconf \
-	automake && \
-	rm -rf /var/cache/apk/*
+	automake
 
 WORKDIR /opt
 
@@ -45,7 +44,7 @@ COPY sherlock /opt/sherlock
 WORKDIR /opt
 
 RUN apk add --no-cache sslscan --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ &&\
-	apk update && apk upgrade &&\
+	apk update && apk --no-cache upgrade &&\
 	apk --no-cache add \
 	# Required pkgs for testssl
 	drill coreutils curl procps bash \
@@ -56,8 +55,7 @@ RUN apk add --no-cache sslscan --repository http://dl-3.alpinelinux.org/alpine/e
 	# Finalise build
 	git clone --depth=1 https://github.com/drwetter/testssl.sh.git &&\
 	ln -s /opt/testssl.sh/testssl.sh /usr/local/bin/testssl.sh &&\
-	apk del git &&\
-	rm -rf /var/cache/apk/*
+	apk del git
 
 #USER root
 ENTRYPOINT [ "ruby", "/opt/sherlock/sherlock.rb" ]

@@ -3,7 +3,7 @@ FROM alpine:latest
 #RUN useradd -c 'snmpwn' -m -s /sbin/nologin snmpwn
 WORKDIR /opt
 
-RUN apk update && apk upgrade &&\
+RUN apk --no-cache upgrade &&\
     apk --no-cache add \
     git \
     ruby \
@@ -19,11 +19,30 @@ RUN apk update && apk upgrade &&\
 #
 #   Clean up
 #
-    apk --purge del git && \
-    rm -rf /var/cache/apk/*
+    apk del git
 
-ENV PATH="/opt/snmpwn/:${PATH}"
 USER nobody
 
-ENTRYPOINT [ "snmpwn.rb" ]
+ENTRYPOINT [ "/opt/snmpwn/snmpwn.rb" ]
 CMD [ "--help" ]
+
+# Function for bashrc/zshrc
+
+# snmpwn() {
+#      a=0
+#      args=''
+#      # add docker path prefix
+#      for arg in "$@"; do
+#            ((a++))
+#            if [[ ${@[$((${a}-1))]} =~ "-[hupe]"  ]]; then
+#                 arg="/tmp/snmpwn/${arg}"
+#            fi
+#            args="${args} ${arg}"
+#      done
+#      # if no users/passwords/encryption file then use defaults
+#      if [[ ! ${@[*]} =~ "-u" ]]; then args="${args} -u /opt/snmpwn/users.txt"; fi
+#      if [[ ! ${@[*]} =~ "-p" ]]; then args="${args} -p /opt/snmpwn/passwords.txt"; fi
+#      if [[ ! ${@[*]} =~ "-e" ]]; then args="${args} -e /opt/snmpwn/passwords.txt"; fi
+#      # run docker command
+#      eval "docker run --rm -it -v `pwd`:/tmp/snmpwn snmpwn ${args}"
+# };

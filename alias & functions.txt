@@ -2,15 +2,36 @@
 ### Docker alias & functions ###
 ################################
 
-alias enum4linux="docker run --rm -it enum4linux"
-alias nullinux="docker run --rm -it nullinux"
-alias cme="docker run --rm -it -v /tmp/cme:/tmp/data crackmapexec"
+# wpscan
 alias wpscan="docker run --rm -it wpscanteam/wpscan"
-alias smbclient="docker run --rm -it smbclient"
-alias nmblookup="docker run --rm -it --entrypoint nmblookup smbclient"
-alias testssl="docker run --entrypoint /home/sslassessment/testssl.sh/testssl.sh -it --rm oldsslsupport"
-alias sslscan="docker run --entrypoint /usr/bin/sslscan -it --rm oldsslsupport"
-alias nbtscan="docker run --rm -it nbtscan"
+
+# redsnarf
+alias redsnarf="docker run --rm -it burstears/redsnarf"
+
+# smbclient
+alias smbclient="docker run --rm -it burstears/smbclient smbclient"
+alias nmblookup="docker run --rm -it burstears/smbclient nmblookup"
+alias rpcclient="docker run --rm -it burstears/smbclient rpcclient"
+
+# enum4linux
+alias enum4linux="docker run --rm -it burstears/enum4linux"
+
+# nullinux
+alias nullinux="docker run --rm -it burstears/nullinux"
+
+# nbtscan
+alias nbtscan="docker run --rm -it burstears/nbtscan"
+
+# sslscanner
+alias testssl="docker run --rm -it burstears/sslscanner testssl"
+alias sslscan="docker run --rm -it burstears/sslscanner sslscan"
+alias sslyze="docker run --rm -it burstears/sslscanner sslyze"
+
+# CrackMapExec
+cme() {docker run --rm -it -v `pwd`:/tmp/data burstears/crackmapexec}
+
+# Sherlock
+sherlock() {docker run --rm -it -v `pwd`:/root/Documents/Sherlock_Out/ sherlock /root/Documents/Sherlock_Out/}
 
 snmpwn() {
      a=0
@@ -91,8 +112,8 @@ msfconsole(){
         echo "\n"
 		echo "Press enter to continue or Ctrl-C to cancel"
 		read
-		docker run --rm -it --network="postgres" -v ~/.msf4:/root/.msf4 -v `pwd`:/tmp/data metasploit
+		docker run --rm -it --network="postgres" -v ~/.msf4:/root/.msf4 -v `pwd`:/tmp/data burstears/metasploit-standalone
     else
-        docker run --rm -it -v ~/.msf4:/root/.msf4 -v `pwd`:/tmp/data $@ metasploit
+        docker run --rm -it -v ~/.msf4:/root/.msf4 -v `pwd`:/tmp/data $@ burstears/metasploit-standalone
     fi
 }

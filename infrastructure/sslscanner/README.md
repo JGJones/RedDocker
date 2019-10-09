@@ -10,7 +10,7 @@ Tools
 
     sslscan
     testssl
-    TODO: sslyze
+    sslyze
 
 bashrc/zshrc alias:
 

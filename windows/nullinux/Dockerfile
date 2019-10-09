@@ -1,28 +1,21 @@
 FROM alpine:latest
 LABEL maintainer - JGJ
 
-#RUN useradd -c 'nullinux' -m -s /sbin/nologin nullinux
 WORKDIR /opt
 
-RUN apk update && \
-	apk upgrade && \
-    apk add \
+RUN apk --no-cache add \
     python3 \
-    py3-setuptools \
-    git \
-    samba-client && \
+    samba-client &&\
 #
 # Get nullinux
 #
-	git clone https://github.com/m8r0wn/nullinux.git && \
-	cd nullinux && \
-	rm -rf .git && \
-	pip3 install -r requirements.txt && \
-#
-# Cleanup
-#
-	apk del py3-setuptools ca-certificates libcurl git && \
-	rm -rf /var/cache/apk/*
+	wget https://raw.githubusercontent.com/m8r0wn/nullinux/master/requirements.txt &&\
+	wget https://raw.githubusercontent.com/m8r0wn/nullinux/master/nullinux.py &&\
+	python3 -m pip install -r requirements.txt
 
-ENTRYPOINT [ "/opt/nullinux/nullinux.py" ]
+USER nobody
+ENTRYPOINT [ "python3","/opt/nullinux.py" ]
 CMD [ "-h" ]
+
+# docker build -t burstears/nullinux .
+# alias nullinux="docker run --rm -it burstears/nullinux"

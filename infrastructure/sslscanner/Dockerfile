@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:latest
 MAINTAINER JGJones
 
 # Install git so we can checkout the nassl git repo.
@@ -22,8 +22,9 @@ RUN	apk --no-cache add \
 # Required pkgs for testssl
 	drill coreutils curl procps bash \
 # Required pkg for sslyze
-	python3 \
+	python3 &&\
 # to be removed after
+	apk add --no-cache --virtual temp \
 	git build-base \
 	libffi-dev openssl-dev \
 	linux-headers py3-pip \
@@ -50,17 +51,11 @@ RUN	apk --no-cache add \
 #
 # Cleanup
 #
-	apk del \
-	perl \
-	git \
-	build-base \
-	py3-pip \
-	libffi-dev \
-	openssl-dev \
-	python3-dev \
-	linux-headers &&\
-	rm -rf /var/cache/apk/*
+	apk del temp
 
 USER nobody
-#ENTRYPOINT [ "testssl" ]
-#CMD [ "--help" ]
+CMD [ "testssl --help" ]
+
+# alias testssl="docker run --rm -it burstears/sslscanner testssl"
+# alias sslscan="docker run --rm -it burstears/sslscanner sslscan"
+# alias sslyze="docker run --rm -it burstears/sslscanner sslyze"
