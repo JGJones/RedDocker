@@ -47,14 +47,14 @@ RUN	apk --no-cache add \
 # Install testssl.sh
 #
 	git clone --depth=1 https://github.com/drwetter/testssl.sh.git &&\
-	ln -s /opt/testssl.sh/testssl.sh /usr/local/bin/testssl &&\
+	ln -s /opt/testssl.sh/testssl.sh /usr/bin/testssl &&\
 #
 # Cleanup
 #
 	apk del temp
 
 USER nobody
-CMD [ "testssl --help" ]
+CMD [ "/usr/bin/testssl" ]
 
 # alias testssl="docker run --rm -it burstears/sslscanner testssl"
 # alias sslscan="docker run --rm -it burstears/sslscanner sslscan"

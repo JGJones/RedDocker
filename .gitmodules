@@ -10,3 +10,6 @@
 [submodule "windows/RedSnarf/creddump7"]
 	path = windows/RedSnarf/creddump7
 	url = https://github.com/Neohapsis/creddump7.git
+[submodule "web/gowitness"]
+	path = web/gowitness
+	url = https://github.com/sensepost/gowitness.git
