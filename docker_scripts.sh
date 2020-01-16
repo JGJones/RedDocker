@@ -30,6 +30,9 @@ alias sslyze='docker run --rm -it burstears/sslscanner sslyze'
 # dirble - may need work for pwd...
 alias dirble='docker run --rm -it burstears/dirble'
 
+# Responder.py
+alias responder='docker run --rm -it --network="host" burstears/responder'
+
 # CrackMapExec
 cme() {docker run --rm -it -v `pwd`:/tmp/data burstears/crackmapexec}
 
