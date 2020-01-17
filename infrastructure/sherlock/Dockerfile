@@ -1,5 +1,5 @@
 ##### builder image #####
-FROM alpine:latest AS builder
+FROM alpine:3.11 AS builder
 LABEL maintainer="JGJones"
 
 RUN apk --no-cache add \
@@ -27,12 +27,13 @@ RUN git clone https://github.com/royhills/ike-scan.git &&\
 
 # SHERLOCK 
 
-COPY sherlock/Gemfile /opt
+#COPY sherlock/Gemfile /opt
+RUN wget https://raw.githubusercontent.com/hatlord/sherlock/master/Gemfile
 RUN gem install bundler
 RUN bundle install
 
 ##### final image #####
-FROM alpine:latest
+FROM alpine:3.11
 LABEL maintainer="JGJones"
 
 COPY --from=builder /usr/lib/ruby /usr/lib/ruby

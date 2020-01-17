@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.10
 MAINTAINER JGJones
 
 # Install git so we can checkout the nassl git repo.

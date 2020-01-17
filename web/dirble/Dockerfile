@@ -20,8 +20,8 @@ COPY --from=build /home/dirble/extensions/* extensions/
 # Update base & install requirements
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get dist-upgrade &&\
-	apt-get --no-install-recommends -y install \
+RUN apt-get update && apt-get dist-upgrade -y &&\
+    apt --no-install-recommends -y install \
     libcurl4-openssl-dev &&\
     rm -rf /var/lib/apt/lists/* 
 

@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.10
 
 #RUN useradd -c 'snmpwn' -m -s /sbin/nologin snmpwn
 WORKDIR /opt
