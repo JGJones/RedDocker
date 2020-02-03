@@ -9,9 +9,13 @@ alias wpscan='docker run --rm -it wpscanteam/wpscan'
 alias redsnarf='docker run --rm -it burstears/redsnarf'
 
 # smbclient
-alias smbclient='docker run --rm -it burstears/smbclient smbclient'
+#alias smbclient='docker run --rm -it burstears/smbclient smbclient'
 alias nmblookup='docker run --rm -it burstears/smbclient nmblookup'
 alias rpcclient='docker run --rm -it burstears/smbclient rpcclient'
+
+smbclient() {
+    docker run --rm -it -v `pwd`:/tmp burstears/smbclient smbclient $@
+}
 
 # enum4linux
 alias enum4linux='docker run --rm -it burstears/enum4linux'

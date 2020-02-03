@@ -37,7 +37,7 @@ RUN	apk --no-cache add \
 	cd nassl &&\
 	pipenv install --dev &&\
 	pipenv run invoke build.all &&\
-	python3 setup.py install &&\
+	python3.7 setup.py install &&\
 	cd .. &&\
 	rm -rf nassl &&\
 	pip3 install sslyze &&\
