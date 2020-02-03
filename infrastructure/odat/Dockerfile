@@ -1,36 +1,17 @@
-FROM python:3-alpine3.11
+FROM frolvlad/alpine-glibc:alpine-3.11_glibc-2.30
 
-ENV ORACLE_HOME=/opt/oracle/instantclient_19_5
-ENV LD_LIBRARY_PATH=$ORACLE_HOME
-ENV PATH=$ORACLE_HOME:$PATH
-ENV SQLPATH=$ORACLE_HOME
-ENV TNS_ADMIN=$ORACLE_HOME
+ENV PATH=$PATH:/opt/odat
 
 WORKDIR /opt
-RUN apk update && apk add --no-cache --virtual tmp \
-	zip \
-	build-base \
-	git &&\
-	git clone https://github.com/quentinhardy/odat.git &&\
-	mkdir oracle && cd oracle &&\
-	wget -O 1.zip https://download.oracle.com/otn_software/linux/instantclient/195000/instantclient-basiclite-linux.x64-19.5.0.0.0dbru.zip && \
-	wget -O 2.zip https://download.oracle.com/otn_software/linux/instantclient/195000/instantclient-sqlplus-linux.x64-19.5.0.0.0dbru.zip && \
-	wget -O 3.zip https://download.oracle.com/otn_software/linux/instantclient/195000/instantclient-sdk-linux.x64-19.5.0.0.0dbru.zip &&\
-	unzip 1.zip &&\
-	unzip 2.zip &&\
-	unzip 3.zip &&\
-	rm -rf *.zip &&\
-	pip install \
-	scapy \
-	colorlog \
-	termcolor \
-	pycrypto \
-	argcomplete \
-	pyinstaller \
-	cx_Oracle \
-	passlib &&\
-	apk del tmp
+RUN	wget https://github.com/quentinhardy/odat/releases/download/4.1/odat-linux-libc2.12-x86_64.tar.gz &&\
+	tar xf odat-linux-libc2.12-x86_64.tar.gz &&\
+	mv odat-libc2.12-x86_64 odat &&\
+	adduser odat -D -s /sbin/nologin &&\
+	chown odat -R /opt/odat &&\
+	rm odat-linux-libc2.12-x86_64.tar.gz &&\
+	ln -s /opt/odat/odat-libc2.12-x86_64 /opt/odat/odat
 
 WORKDIR /opt/odat
-
-ENTRYPOINT ["python odat.py"]
+USER odat
+ENTRYPOINT ["odat"]
+CMD ["--help"]
