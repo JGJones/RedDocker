@@ -50,12 +50,15 @@ RUN apk add --no-cache sslscan --repository http://dl-3.alpinelinux.org/alpine/e
 	# Required pkgs for testssl
 	drill coreutils curl procps bash \
 	# Required pkgs for sherlock
-	nmap samba-client curl ruby ntpsec\
+	nmap nmap-scripts samba-client curl ruby ntpsec\
 	# Remove after use
 	git &&\
 	# Finalise build
 	git clone --depth=1 https://github.com/drwetter/testssl.sh.git &&\
+	rm -rf testssl.sh/.git &&\
 	ln -s /opt/testssl.sh/testssl.sh /usr/local/bin/testssl.sh &&\
+	git clone https://github.com/hatlord/sherlock.git &&\
+	rm -rf sherlock/.git &&\
 	apk del git
 
 #USER root

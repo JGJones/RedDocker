@@ -128,3 +128,7 @@ msfconsole(){
         docker run --rm -it -v ~/.msf4:/root/.msf4 -v `pwd`:/tmp/data $@ burstears/metasploit-standalone
     fi
 }
+
+alias odat="docker run --rm -it burstears/odat"
+
+alias rsdns="docker run --rm -it burstears/rsdns"
