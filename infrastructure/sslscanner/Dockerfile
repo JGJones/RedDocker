@@ -1,61 +1,66 @@
-FROM alpine:3.10
-MAINTAINER JGJones
+FROM ubuntu:18.04 AS build
 
-# Install git so we can checkout the nassl git repo.
-#
-# Also install build-base, libffi, libffi-dev, openssl, and
-# openssl-dev since they are needed to build some of the dependencies
-# of domain-scan.  With the exception of libffi and openssl, these are
-# all build dependencies that can be removed at the end.
-
-# Update base
-RUN apk update && apk --no-cache upgrade && rm -rf /var/cache/apk/*
-
-# Install sslscan
-RUN apk add --no-cache sslscan --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ && \
-	rm -rf /var/cache/apk/*
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV VENV=/opt/venv
 
 WORKDIR /opt
 
-# install sslyze & testssl
-RUN	apk --no-cache add \
-# Required pkgs for testssl
-	drill coreutils curl procps bash \
-# Required pkg for sslyze
-	python3 &&\
-# to be removed after
-	apk add --no-cache --virtual temp \
-	git build-base \
-	libffi-dev openssl-dev \
-	linux-headers py3-pip \
-	python3-dev perl &&\
+RUN apt update && apt install --no-install-recommends -y \
+	build-essential \
+	python3 \
+	python3-pip \
+	python3-wheel \
+	python3-setuptools \
+	python3-virtualenv \
+	git \
+	zlib1g-dev &&\
 #
-# sslyze
+# openssl with SSLv2/SSLv3 support
 #
-	pip3 install --upgrade setuptools pipenv &&\
-	git clone https://github.com/nabla-c0d3/nassl.git &&\
-	cd nassl &&\
-	pipenv install --dev &&\
-	pipenv run invoke build.all &&\
-	python3.7 setup.py install &&\
+	git clone https://github.com/PeterMosmans/openssl.git &&\
+	cd openssl &&\
+	./config zlib-dynamic &&\
+	make depend &&\
+	make install &&\
 	cd .. &&\
-	rm -rf nassl &&\
-	pip3 install sslyze &&\
-	rm -rf ~/.cache/* &&\
-	rm -rf ~/.share/* &&\
 #
-# Install testssl.sh
+# sslscan & testssl.sh	
 #
-	git clone --depth=1 https://github.com/drwetter/testssl.sh.git &&\
-	ln -s /opt/testssl.sh/testssl.sh /usr/bin/testssl &&\
+	git clone https://github.com/rbsec/sslscan.git &&\
+	cd sslscan &&\
+	make && make install &&\
+	cd .. &&\
+	git clone --depth 1 https://github.com/drwetter/testssl.sh.git &&\
+	rm -r testssl.sh/.git &&\
 #
-# Cleanup
+# SSLYZE
 #
-	apk del temp
+	python3 -m virtualenv --python=/usr/bin/python3 $VENV &&\
+	export PATH="$VENV/bin:$PATH" &&\
+	pip3 install sslyze
 
-USER nobody
-CMD [ "/usr/bin/testssl" ]
+FROM ubuntu:18.04
 
-# alias testssl="docker run --rm -it burstears/sslscanner testssl"
-# alias sslscan="docker run --rm -it burstears/sslscanner sslscan"
-# alias sslyze="docker run --rm -it burstears/sslscanner sslyze"
+ENV VENV=/opt/venv
+ENV PATH="$VENV/bin:/usr/local/ssl/bin:/opt/testssl.sh:/opt/sslscan:$PATH"
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+WORKDIR /opt
+
+COPY --from=build /usr/local/ssl /usr/local/ssl
+COPY --from=build /opt/sslscan /opt/sslscan
+COPY --from=build /opt/testssl.sh /opt/testssl.sh
+COPY --from=build $VENV $VENV
+
+RUN apt update && apt install --no-install-recommends -y \
+	bsdmainutils \
+	python3 \
+	unattended-upgrades &&\
+	unattended-upgrade -d &&\
+	apt purge unattended-upgrades -y &&\
+	apt --purge autoremove -y &&\
+	rm -rf /var/lib/apt/*
