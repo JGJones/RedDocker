@@ -27,7 +27,6 @@ RUN git clone https://github.com/royhills/ike-scan.git &&\
 
 # SHERLOCK 
 
-#COPY sherlock/Gemfile /opt
 RUN wget https://raw.githubusercontent.com/hatlord/sherlock/master/Gemfile
 RUN gem install bundler
 RUN bundle install
@@ -40,7 +39,6 @@ COPY --from=builder /usr/lib/ruby /usr/lib/ruby
 COPY --from=builder /usr/local/bin/ike-scan /usr/local/bin/ike-scan
 COPY --from=builder /usr/local/bin/psk-crack /usr/local/bin/psk-crack
 COPY --from=builder /usr/local/share/ike-scan /usr/local/share/ike-scan
-COPY sherlock /opt/sherlock
 
 WORKDIR /opt
 
