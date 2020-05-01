@@ -15,31 +15,30 @@ RUN apt update && apt install --no-install-recommends -y \
 	python3-setuptools \
 	python3-virtualenv \
 	git \
-	zlib1g-dev &&\
+	zlib1g-dev
 #
 # openssl with SSLv2/SSLv3 support
 #
-	git clone https://github.com/PeterMosmans/openssl.git &&\
+RUN	git clone https://github.com/PeterMosmans/openssl.git &&\
 	cd openssl &&\
 	./config zlib-dynamic &&\
 	make depend &&\
-	make install &&\
-	cd .. &&\
+	make install
 #
 # sslscan & testssl.sh	
 #
-	git clone https://github.com/rbsec/sslscan.git &&\
+RUN	git clone https://github.com/rbsec/sslscan.git &&\
 	cd sslscan &&\
-	make && make install &&\
-	cd .. &&\
-	git clone --depth 1 https://github.com/drwetter/testssl.sh.git &&\
-	rm -r testssl.sh/.git &&\
+	make static && make install
+
+RUN	git clone --depth 1 https://github.com/drwetter/testssl.sh.git &&\
+	rm -r testssl.sh/.git 
 #
 # SSLYZE
 #
-	python3 -m virtualenv --python=/usr/bin/python3 $VENV &&\
-	export PATH="$VENV/bin:$PATH" &&\
-	pip3 install sslyze
+RUN	python3 -m virtualenv --python=/usr/bin/python3 $VENV &&\
+	export PATH="$VENV/bin:$PATH" 
+RUN	pip3 install sslyze
 
 FROM ubuntu:18.04
 
