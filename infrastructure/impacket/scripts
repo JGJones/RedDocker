@@ -1,0 +1,1 @@
+docker run --rm -it -v -v `pwd`:/tmp/ burstears/impacket smbmap.py
