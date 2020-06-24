@@ -19,7 +19,7 @@ ENV PATH="$VENV/bin:$PATH"
 
 RUN git clone https://github.com/ShawnDEvans/smbmap.git &&\
 	cd smbmap  &&\
-	pip install -r requirements.txt  &&\
+	pip install -r requirements.txt &&\
 	rm -Rf .git
 
 RUN wget https://github.com/SecureAuthCorp/impacket/releases/download/impacket_0_9_21/impacket-0.9.21.tar.gz -O tmp.tar.gz &&\
@@ -29,17 +29,25 @@ RUN wget https://github.com/SecureAuthCorp/impacket/releases/download/impacket_0
 	pip install -r requirements.txt &&\
 	pip install .
 
+RUN git clone https://github.com/ropnop/windapsearch.git &&\
+	cd windapsearch &&\
+	apk add --no-cache openldap-dev &&\
+	pip install -r requirements.txt &&\
+	rm -Rf .git
 
 FROM python:3-alpine as final
 
 ENV VENV="/opt/venv"
-ENV PATH="$VENV/bin:/opt/impacket:/opt/smbmap:$PATH"
+ENV PATH="$VENV/bin:/opt/impacket:/opt/smbmap:/opt/windapsearch:$PATH"
 
 COPY --from=build $VENV $VENV
 COPY --from=build /opt/smbmap /opt/smbmap
+COPY --from=build /opt/windapsearch /opt/windapsearch
 COPY --from=build /opt/impacket/examples /opt/impacket
 
 RUN apk --no-cache add samba-client
+
+WORKDIR /tmp
 
 #ENTRYPOINT [""]
 #CMD ["--help"]

@@ -1,10 +1,9 @@
-FROM alpine:3.11
+FROM python:3-alpine
 LABEL maintainer - JGJ
 
 WORKDIR /opt
 
 RUN apk --no-cache add \
-    python3 \
     samba-client &&\
 #
 # Get nullinux
@@ -13,7 +12,7 @@ RUN apk --no-cache add \
 	wget https://raw.githubusercontent.com/m8r0wn/nullinux/master/nullinux.py &&\
 	python3 -m pip install -r requirements.txt
 
-USER nobody
+WORKDIR /tmp
 ENTRYPOINT [ "python3","/opt/nullinux.py" ]
 CMD [ "-h" ]
 

@@ -382,9 +382,15 @@ sub get_workgroup {
 		$global_workgroup = `nmblookup -A '$global_target'`; # Global var.  Erg!
 		($global_workgroup) = $global_workgroup =~ /\s+(\S+)\s+<00> - <GROUP>/s;
 		unless (defined($global_workgroup)) {
+<<<<<<< HEAD
 			print "[E] Can\'t find workgroup/domain\nDefaulting to WORKGROUP as dirty workaround";
 			($global_workgroup) = "WORKGROUP";    
 			print "\n";
+=======
+			print "[E] Can\'t find workgroup/domain\nDefaulting to WORKGROUP as a dirty workaround\n";
+   			($global_workgroup) = "WORKGROUP";
+   			print "\n";
+>>>>>>> 4f4309a131baf848a078053de17f4fc057d9cd81
 			return undef;
 		}
 		unless (defined($global_workgroup) and $global_workgroup =~ /^[A-Za-z0-9_\.-]+$/) {
