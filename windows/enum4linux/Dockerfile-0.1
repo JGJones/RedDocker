@@ -1,16 +1,13 @@
-FROM alpine:3.12
+FROM alpine:3.10
 LABEL maintainer - JGJ
 
 WORKDIR /tmp
 
-# Temp solution to fix known issue here https://github.com/CiscoCXSecurity/enum4linux/issues/7#issuecomment-585866779
-COPY enum4linux.pl /usr/local/bin/enum4linux
-
 #
 # enum4linux
 #
-RUN wget https://raw.githubusercontent.com/Wh1t3Fox/polenum/master/polenum.py -O /usr/local/bin/polenum.py && \
-#    wget https://raw.githubusercontent.com/CiscoCXSecurity/enum4linux/master/enum4linux.pl -O /usr/local/bin/enum4linux && \
+RUN wget https://raw.githubusercontent.com/Wh1t3Fox/polenum/master/polenum.py > /usr/local/bin/polenum.py && \
+    wget https://raw.githubusercontent.com/portcullislabs/enum4linux/master/enum4linux.pl > /usr/local/bin/enum4linux && \
     chmod +x /usr/local/bin/polenum.py && \
     chmod +x /usr/local/bin/enum4linux
 
@@ -19,23 +16,24 @@ RUN apk update && apk --no-cache upgrade &&\
     samba \
     dialog \
     openldap-clients \
-    python3 \
+    python2 \
     perl \
     perl-getopt-long \
     perl-data-dumper &&\
 # packages to be removed in clean-up:
     apk add --no-cache --virtual temp \
-    py3-setuptools \
-    py3-pip \
-    gcc \
-    python3-dev \
+    py2-setuptools \
+    git \
+    build-base \
+    python2-dev \
     libffi-dev \
-    openssl-dev \
-    musl-dev &&\
+    openssl-dev && \
 #
 # Impacket
 #
-    pip3 install impacket &&\
+    git clone https://github.com/SecureAuthCorp/impacket.git && \
+	cd impacket && python setup.py install && \
+	rm -rf /tmp/impacket && \
 #
 # Clean up
 #
