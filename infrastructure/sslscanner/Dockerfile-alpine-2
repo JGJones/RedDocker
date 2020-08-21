@@ -1,0 +1,87 @@
+FROM alpine:3.12 AS build
+MAINTAINER JGJones
+
+# slim version of sslscanner based on alpine 3.12 and sslscan2/testssl
+# sslyze not added at this time
+
+WORKDIR /opt
+
+# Update base & add dev tools
+
+RUN apk update && apk --no-cache upgrade && rm -rf /var/cache/apk/* &&\
+	apk add \
+	linux-headers \
+	openssl-dev \
+	zlib-dev \
+	musl-dev \
+	perl \
+	make \
+	gcc \
+	git
+
+# Install sslscan
+RUN	git clone https://github.com/rbsec/sslscan.git &&\
+	cd sslscan &&\
+	make static && make install
+
+# Install testssl
+RUN	git clone --depth=1 https://github.com/drwetter/testssl.sh.git &&\
+	cd testssl.sh \
+	rm -rf doc .git t \
+	rm C* Dockerfile*
+
+# install sslyze & testssl
+#RUN	apk --no-cache add \
+# Required pkgs for testssl
+#	drill coreutils curl procps bash \
+# Required pkg for sslyze
+#	python3 &&\
+# to be removed after
+#	apk add --no-cache --virtual temp \
+#	git build-base \
+#	libffi-dev openssl-dev \
+#	linux-headers py3-pip \
+#	python3-dev perl &&\
+#
+# sslyze
+#
+#	pip3 install --upgrade setuptools pipenv &&\
+#	git clone https://github.com/nabla-c0d3/nassl.git &&\
+#	cd nassl &&\
+#	pipenv install --dev &&\
+#	pipenv run invoke build.all &&\
+#	python3.7 setup.py install &&\
+#	cd .. &&\
+#	rm -rf nassl &&\
+#	pip3 install sslyze &&\
+#	rm -rf ~/.cache/* &&\
+#	rm -rf ~/.share/* &&\
+#
+#
+# Cleanup
+#
+#	apk del temp
+
+FROM alpine:3.12
+
+WORKDIR /opt
+
+COPY --from=build /usr/bin/sslscan /usr/bin/sslscan
+COPY --from=build /opt/testssl.sh /opt/testssl
+
+RUN apk update && apk --no-cache upgrade &&\
+	apk add \
+	drill \
+	coreutils \
+	curl \
+	procps \
+	bash && \
+	rm -rf /var/cache/apk/* &&\
+	ln -s /opt/testssl/testssl.sh /usr/bin/testssl
+
+USER nobody
+#CMD [ "/usr/bin/testssl" ]
+
+# alias testssl="docker run --rm -it burstears/sslscanner testssl"
+# alias sslscan="docker run --rm -it burstears/sslscanner sslscan"
+# alias sslyze="docker run --rm -it burstears/sslscanner sslyze"
